@@ -19,86 +19,46 @@ class Traffic extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      red: false,
-      yellow: false,
-      green: false,
-      button: true
+      color: -1,
+      button: false
     }
-
+    this.timer = null
     this.handleToggleTraffic = this.handleToggleTraffic.bind(this);
   }
 
-  handleToggleTraffic() {
-    let status = this.state.button
+  handleToggleTraffic(status) {
+    this.setState({ button: status })
+    console.log(status)
+    let current = -1
 
-    switch (status) {
-      case true:
+    if (status) {
+      this.timer = setInterval(() => {
 
-        Promise.resolve()
-          .then(() => this.handleLight('red'))
-          .then(() => this.delay(1000))
-          .then(() => this.handleLight('green'))
-          .then(() => this.delay(1000))
-          .then(() => this.handleLight('yellow'))
-          .then(() => this.delay(1000))
-          .then(() => this.handleLight('red'))
-          .then(() => this.delay(1000))
-          .then(() => this.handleLight('green'))
-          .then(() => this.delay(1000))
-          .then(() => this.handleLight('yellow'))
-          .then(() => this.delay(1000))
+        if (current < 2) {
+          current = current + 1
+        }
+        else {
+          current = 0
+        }
+        this.setState({ color: current })
 
+      }, 1000)
 
-        this.setState({ button: false });
-        break;
-      case false:
-
-        this.setState({ button: true, red: false, yellow: false, green: false })
-        break;
-
-      default:
-        break;
+    } else {
+      clearInterval(this.timer)
+      this.setState({ color: -1 })
     }
-
-
-  }
-
-  handleLight(color) {
-
-    switch (color) {
-      case 'red':
-        this.setState({ yellow: false })
-        this.setState({ red: true })
-        break;
-      case 'yellow':
-        this.setState({ green: false })
-        this.setState({ yellow: true })
-        break;
-      case 'green':
-        this.setState({ red: false })
-        this.setState({ green: true })
-        break;
-      default:
-        break;
-    }
-
-  }
-
-  delay(duration) {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve(), duration);
-    });
   }
 
   render() {
     return (
       <div className="back">
         <div className="traffic-lights">
-          <Light color={this.state.red ? "red" : "black"} />
-          <Light color={this.state.yellow ? "yellow" : "black"} />
-          <Light color={this.state.green ? "green" : "black"} />
+          <Light color={this.state.color === 2 ? "red" : "black"} />
+          <Light color={this.state.color === 1 ? "yellow" : "black"} />
+          <Light color={this.state.color === 0 ? "green" : "black"} />
         </div>
-        <button className="button" style={{ background: this.state.button ? "green" : "red" }} onClick={this.handleToggleTraffic}>{this.state.button ? "Start traffic" : "Stop traffic"}</button>
+        <button className="button" style={{ background: !this.state.button ? "green" : "red" }} onClick={() => this.handleToggleTraffic(!this.state.button)}>{!this.state.button ? "Start traffic" : "Stop traffic"}</button>
 
       </div>
     )
